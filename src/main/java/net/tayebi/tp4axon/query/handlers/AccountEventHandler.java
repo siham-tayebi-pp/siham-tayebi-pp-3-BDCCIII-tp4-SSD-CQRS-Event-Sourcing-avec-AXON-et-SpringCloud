@@ -17,8 +17,9 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class AccountEventHandler {
-
+    @Autowired
     private AccountRepository accountRepository;
+    @Autowired
     private AccountOperationRepository operationRepository;
     @Autowired
     private QueryUpdateEmitter queryUpdateEmitter;   // + dans le constructeur
