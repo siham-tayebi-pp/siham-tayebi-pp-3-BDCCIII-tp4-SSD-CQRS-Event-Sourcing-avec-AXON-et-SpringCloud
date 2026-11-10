@@ -2,8 +2,12 @@ package net.tayebi.tp4axon.commande.controllers;
 
 import net.tayebi.tp4axon.commande.commandes.AddAccountCommand;
 import net.tayebi.tp4axon.commande.commandes.CreditAccountCommand;
+import net.tayebi.tp4axon.commande.commandes.DebitAccountCommand;
+import net.tayebi.tp4axon.commande.commandes.UpdateAccountStatusCommand;
 import net.tayebi.tp4axon.dto.AddNewAccountRequestDTO;
 import net.tayebi.tp4axon.dto.CreditAccountRequestDTO;
+import net.tayebi.tp4axon.dto.DebitAccountRequestDTO;
+import net.tayebi.tp4axon.dto.UpdateAccountStatusRequestDTO;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +55,16 @@ public class AccountCommandController {
                 request.amount(),
                 request.currency()
         ));
+    }
+    @PostMapping("/account/debit")
+    public CompletableFuture<String> debitAccount(@RequestBody DebitAccountRequestDTO request) {
+        return commandGateway.send(new DebitAccountCommand(
+                request.accountId(), request.amount(), request.currency()));
+    }
+    @PutMapping("/account/updateStatus")
+    public CompletableFuture<String> updateStatus(@RequestBody UpdateAccountStatusRequestDTO request) {
+        return commandGateway.send(new UpdateAccountStatusCommand(
+                request.accountId(), request.status()));
     }
 
 }
