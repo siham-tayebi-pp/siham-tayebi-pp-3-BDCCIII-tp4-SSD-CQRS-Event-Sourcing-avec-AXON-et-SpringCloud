@@ -7,6 +7,8 @@ import net.tayebi.tp4axon.dto.CreditAccountRequestDTO;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -32,8 +34,11 @@ public class AccountCommandController {
         return result;
     }
     @ExceptionHandler(Exception.class)
-    public String handleException(Exception e){
-        return e.getMessage();
+    public ResponseEntity<String> exceptionHandler(Exception exception) {
+        Throwable root = exception;
+        while (root.getCause() != null) root = root.getCause();
+        root.printStackTrace();
+        return new ResponseEntity<>(root.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
     @GetMapping("/events/{accountId}")
     public Stream<?> eventStore(@PathVariable String accountId) {
