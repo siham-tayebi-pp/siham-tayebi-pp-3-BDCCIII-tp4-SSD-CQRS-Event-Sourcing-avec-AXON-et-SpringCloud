@@ -5,10 +5,13 @@ import net.tayebi.tp4axon.commande.events.*;
 import net.tayebi.tp4axon.enums.OperationType;
 import net.tayebi.tp4axon.query.entities.Account;
 import net.tayebi.tp4axon.query.entities.AccountOperation;
+import net.tayebi.tp4axon.query.queries.WatchEventQuery;
 import net.tayebi.tp4axon.query.repository.AccountOperationRepository;
 import net.tayebi.tp4axon.query.repository.AccountRepository;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.eventhandling.EventMessage;
+import org.axonframework.queryhandling.QueryUpdateEmitter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +20,8 @@ public class AccountEventHandler {
 
     private AccountRepository accountRepository;
     private AccountOperationRepository operationRepository;
+    @Autowired
+    private QueryUpdateEmitter queryUpdateEmitter;   // + dans le constructeur
 
     public AccountEventHandler(AccountRepository accountRepository,
                                AccountOperationRepository operationRepository) {
@@ -64,10 +69,12 @@ public class AccountEventHandler {
                 .currency(event.getCurrency())
                 .account(account)
                 .build();
-        operationRepository.save(accountOperation);
+        AccountOperation saved = operationRepository.save(accountOperation);
         // Mise à jour du solde
         account.setBalance(account.getBalance() - accountOperation.getAmount());
         accountRepository.save(account);
+        queryUpdateEmitter.emit(WatchEventQuery.class, query -> true, saved);
+
     }
 
     @EventHandler
@@ -81,9 +88,14 @@ public class AccountEventHandler {
                 .currency(event.getCurrency())
                 .account(account)
                 .build();
-        operationRepository.save(accountOperation);
+        AccountOperation saved = operationRepository.save(accountOperation);
         // Mise à jour du solde
         account.setBalance(account.getBalance() + accountOperation.getAmount());
         accountRepository.save(account);
+        queryUpdateEmitter.emit(WatchEventQuery.class, query -> true, saved);
+
+
     }
+
+
 }

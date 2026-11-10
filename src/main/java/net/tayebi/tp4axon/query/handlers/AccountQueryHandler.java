@@ -5,6 +5,7 @@ import net.tayebi.tp4axon.query.entities.Account;
 import net.tayebi.tp4axon.query.entities.AccountOperation;
 import net.tayebi.tp4axon.query.queries.GetAccountStatementQuery;
 import net.tayebi.tp4axon.query.queries.GetAllAccountsQuery;
+import net.tayebi.tp4axon.query.queries.WatchEventQuery;
 import net.tayebi.tp4axon.query.repository.AccountOperationRepository;
 import net.tayebi.tp4axon.query.repository.AccountRepository;
 import org.axonframework.queryhandling.QueryHandler;
@@ -33,5 +34,9 @@ public class AccountQueryHandler {
         Account account = accountRepository.findById(query.getAccountId()).get();
         List<AccountOperation> operations = operationRepository.findByAccountId(query.getAccountId());
         return new AccountStatementResponseDTO(account, operations);
+    }
+    @QueryHandler
+    public AccountOperation on(WatchEventQuery query) {
+        return AccountOperation.builder().build();
     }
 }
